@@ -26,3 +26,7 @@ func GetDatabaseConfig() *DatabaseConfig {
 
 	return internalDatabaseConfig
 }
+
+func GetHashingCost() int {
+	return 16
+}
