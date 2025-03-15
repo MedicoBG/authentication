@@ -117,4 +117,6 @@ fabric.properties
 ### SQLC ###
 repo/db
 
-ent/*
+### Env ###
+.env
+.env.*
