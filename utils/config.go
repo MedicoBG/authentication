@@ -15,18 +15,40 @@ type DatabaseConfig struct {
 
 var internalDatabaseConfig *DatabaseConfig
 
+func LoadDatabaseConfig() {
+	internalDatabaseConfig = &DatabaseConfig{}
+	err := env.Parse(internalDatabaseConfig)
+	if err != nil {
+		panic(err)
+	}
+}
+
 func GetDatabaseConfig() *DatabaseConfig {
 	if internalDatabaseConfig == nil {
-		internalDatabaseConfig = &DatabaseConfig{}
-		err := env.Parse(internalDatabaseConfig)
-		if err != nil {
-			panic(err)
-		}
+		LoadDatabaseConfig()
 	}
 
 	return internalDatabaseConfig
 }
 
-func GetHashingCost() int {
-	return 16
+type HashingConfig struct {
+	Cost int `env:"HASHING_COST" envDefault:"16"`
+}
+
+var internalHashingCost *HashingConfig
+
+func LoadHashingCost() {
+	internalHashingCost = &HashingConfig{}
+	err := env.Parse(internalHashingCost)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func GetHashingConfig() *HashingConfig {
+	if internalHashingCost == nil {
+		LoadHashingCost()
+	}
+
+	return internalHashingCost
 }

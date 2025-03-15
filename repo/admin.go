@@ -46,7 +46,7 @@ func (a *AdminRepo) GetAdminAuthByEmail(email string, ctxOptional ...context.Con
 }
 
 func (a *AdminRepo) CreateModeratorAuth(email, password string, moderatorType db.ModeratorType, ctxOptional ...context.Context) error {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), utils.GetHashingCost())
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), utils.GetHashingConfig().Cost)
 	if err != nil {
 		return err
 	}
