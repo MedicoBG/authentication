@@ -3,6 +3,7 @@ package repo
 import (
 	"authentication/repo/db"
 	"authentication/utils"
+	"github.com/jackc/pgx/v5"
 	"golang.org/x/net/context"
 )
 
@@ -13,7 +14,7 @@ type ModeratorRepoMutator interface {
 }
 
 type ModeratorRepo struct {
-	connection *Connection
+	connection *pgx.Conn
 	queries    *db.Queries
 }
 
@@ -28,7 +29,7 @@ func NewModeratorRepo(ctxOptional ...context.Context) *ModeratorRepo {
 	connection := newConnection(utils.GetDatabaseConfig(), ctx)
 	return &ModeratorRepo{
 		connection: connection,
-		queries:    db.New(connection),
+		queries:    db.New(),
 	}
 }
 

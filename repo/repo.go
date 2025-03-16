@@ -8,10 +8,6 @@ import (
 	"net/url"
 )
 
-type Connection struct {
-	*pgx.Conn
-}
-
 type BaseRepo interface {
 	Close(ctxOptional ...context.Context) error
 }
@@ -34,12 +30,12 @@ func dsnParser(dbConfig *utils.DatabaseConfig) string {
 	return baseUrl.String()
 }
 
-func newConnection(dbConfig *utils.DatabaseConfig, ctxOptional ...context.Context) *Connection {
+func newConnection(dbConfig *utils.DatabaseConfig, ctxOptional ...context.Context) *pgx.Conn {
 	ctx := utils.FirstContextOrBackground(ctxOptional)
 	connection, err := pgx.Connect(ctx, dsnParser(dbConfig))
 	if err != nil {
 		panic(err)
 	}
 
-	return &Connection{connection}
+	return connection
 }

@@ -4,11 +4,12 @@ import (
 	"authentication/repo/db"
 	"authentication/utils"
 	"context"
+	"github.com/jackc/pgx/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AdminRepoQuerier interface {
-	GetAdminAuthByEmail(email string, ctxOptional ...context.Context) (db.AdminAuth, error)
+	GetAdminAuthByEmail(email string, ctxOptional ...context.Context) (*db.AdminAuth, error)
 }
 
 type AdminRepoMutator interface {
@@ -16,7 +17,7 @@ type AdminRepoMutator interface {
 }
 
 type AdminRepo struct {
-	connection *Connection
+	connection *pgx.Conn
 	queries    *db.Queries
 }
 
@@ -31,7 +32,7 @@ func NewAdminRepository(ctxOptional ...context.Context) *AdminRepo {
 	connection := newConnection(utils.GetDatabaseConfig(), ctx)
 	return &AdminRepo{
 		connection: connection,
-		queries:    db.New(connection),
+		queries:    db.New(),
 	}
 }
 
@@ -40,9 +41,9 @@ func (a *AdminRepo) Close(ctxOptional ...context.Context) error {
 	return a.connection.Close(ctx)
 }
 
-func (a *AdminRepo) GetAdminAuthByEmail(email string, ctxOptional ...context.Context) (db.AdminAuth, error) {
+func (a *AdminRepo) GetAdminAuthByEmail(email string, ctxOptional ...context.Context) (*db.AdminAuth, error) {
 	ctx := utils.FirstContextOrBackground(ctxOptional)
-	return a.queries.GetAdminAuthByEmail(ctx, email)
+	return a.queries.GetAdminAuthByEmail(ctx, a.connection, email)
 }
 
 func (a *AdminRepo) CreateModeratorAuth(email, password string, moderatorType db.ModeratorType, ctxOptional ...context.Context) error {
@@ -52,7 +53,7 @@ func (a *AdminRepo) CreateModeratorAuth(email, password string, moderatorType db
 	}
 
 	ctx := utils.FirstContextOrBackground(ctxOptional)
-	return a.queries.CreateModeratorAuth(ctx, db.CreateModeratorAuthParams{
+	return a.queries.CreateModeratorAuth(ctx, a.connection, &db.CreateModeratorAuthParams{
 		Email:    email,
 		Password: hashedPassword,
 		Type:     moderatorType,
